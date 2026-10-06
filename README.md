@@ -15,11 +15,6 @@ visual (Explainable AI). UI baru untuk demo DINO.
 ```bash
 pip install -r requirements.txt
 
-# Checkpoint & model card belum disalin ke ./checkpoints?
-# arahkan ke folder demo lama lewat env CKPT_DIR:
-#   PowerShell : $env:CKPT_DIR="C:/Users/gic12/PycharmProjects/DINO_Demo/checkpoints"
-#   bash       : export CKPT_DIR="C:/Users/gic12/PycharmProjects/DINO_Demo/checkpoints"
-
 python app.py
 # buka http://127.0.0.1:5000
 ```
