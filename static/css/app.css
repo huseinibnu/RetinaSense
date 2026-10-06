@@ -1,0 +1,60 @@
+/* RetinaSense — gaya tambahan di luar utilitas Tailwind.
+   Sebagian besar hierarki dibuat lewat spacing + border + background. */
+
+:root { color-scheme: light; }
+
+body { -webkit-font-smoothing: antialiased; }
+
+/* gradient legend heatmap: Blue -> Cyan -> Green -> Yellow -> Red */
+.heatmap-legend {
+  background: linear-gradient(90deg, #1d4ed8, #06b6d4, #22c55e, #eab308, #ef4444);
+}
+
+/* progress bar probability */
+.prob-track { background: #F1F5F9; border-radius: 9999px; height: 8px; overflow: hidden; }
+.prob-fill  { height: 100%; border-radius: 9999px; background: #2563EB; transition: width .4s ease; }
+.prob-fill.is-top { background: #1D4ED8; }
+
+/* scrollbar tipis untuk strip thumbnail */
+.thin-scroll::-webkit-scrollbar { height: 6px; }
+.thin-scroll::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 9999px; }
+
+/* badge "DEMO" di heatmap mock */
+.mock-badge {
+  position: absolute; top: 6px; right: 6px;
+  font-size: 10px; font-weight: 600; letter-spacing: .04em;
+  padding: 2px 6px; border-radius: 6px;
+  background: rgba(15,23,42,.72); color: #fff;
+}
+
+[x-cloak] { display: none !important; }
+
+/* ===== Top navbar: transparan di atas, solid + blur saat scroll ===== */
+#topnav {
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition: background-color .25s ease, border-color .25s ease, box-shadow .25s ease;
+}
+#topnav.nav-scrolled {
+  background: rgba(255, 255, 255, .85);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom-color: #E2E8F0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .05);
+}
+
+/* ===== Nav link: underline animasi dari tengah ===== */
+.nav-link { position: relative; }
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 12px; right: 12px; bottom: 0;
+  height: 2px; border-radius: 2px;
+  background: #2563EB;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform .25s ease;
+}
+.nav-link:hover::after { transform: scaleX(.5); }
+.nav-link.is-active::after { transform: scaleX(1); }
+.nav-link.is-active { color: #2563EB; }

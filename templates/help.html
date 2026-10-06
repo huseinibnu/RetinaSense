@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Help{% endblock %}
+
+{% block content %}
+<header class="mb-6">
+  <h1 class="text-[28px] font-bold tracking-tight">Help & Documentation</h1>
+  <p class="text-[14px] text-ink-600 mt-1">Panduan singkat penggunaan RetinaSense.</p>
+</header>
+
+<div class="rounded-card border border-line bg-surface p-5 mb-5">
+  <h3 class="font-semibold text-[15px] mb-3">Alur analisis</h3>
+  <ol class="space-y-2 text-[13px] text-ink-600 list-decimal list-inside">
+    <li>Pilih <b>modality</b>: Funduscopy (CFP) atau OCT.</li>
+    <li>Pilih <b>model</b> (V1 = ViT-B/14, V2 = ViT-L/14).</li>
+    <li>Atur <b>TTA</b> — direkomendasikan aktif untuk hasil lebih stabil.</li>
+    <li>Unggah <b>satu atau beberapa citra</b> (maks 16).</li>
+    <li>Klik <b>Analisis Citra</b>, lalu tinjau hasil & penjelasan.</li>
+  </ol>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+  <!-- Istilah: input & model -->
+  <div class="rounded-card border border-line bg-surface p-5">
+    <h3 class="font-semibold text-[15px] mb-3">Istilah — input & model</h3>
+    <dl class="space-y-3 text-[13px]">
+      <div><dt class="font-medium">Modality (CFP / OCT)</dt><dd class="text-ink-500">Jenis citra retina. <b>CFP/Funduscopy</b> = foto permukaan retina. <b>OCT</b> = citra penampang lapisan retina.</dd></div>
+      <div><dt class="font-medium">Model V1 / V2</dt><dd class="text-ink-500">Dua ukuran jaringan DINOv2. <b>V1 (ViT-B/14)</b> lebih ringan & cepat; <b>V2 (ViT-L/14)</b> lebih besar, umumnya lebih akurat tapi lebih lambat.</dd></div>
+      <div><dt class="font-medium">TTA (Test-Time Augmentation)</dt><dd class="text-ink-500">Citra diprediksi beberapa kali dengan sedikit variasi (mis. dibalik) lalu dirata-rata, agar hasil lebih stabil dan tidak mudah terpengaruh posisi/cahaya.</dd></div>
+      <div><dt class="font-medium">DINOv2</dt><dd class="text-ink-500">Model dasar (backbone) yang sudah dilatih pada jutaan gambar, lalu kami sesuaikan untuk citra retina.</dd></div>
+    </dl>
+  </div>
+
+  <!-- Istilah: hasil -->
+  <div class="rounded-card border border-line bg-surface p-5">
+    <h3 class="font-semibold text-[15px] mb-3">Istilah — hasil & penjelasan</h3>
+    <dl class="space-y-3 text-[13px]">
+      <div><dt class="font-medium">Confidence</dt><dd class="text-ink-500">Seberapa yakin model pada prediksinya (0–100%). Angka tinggi ≠ pasti benar — tetap perlu penilaian dokter.</dd></div>
+      <div><dt class="font-medium">Distribusi probabilitas</dt><dd class="text-ink-500">Perkiraan peluang untuk setiap kemungkinan kelas, ditampilkan sebagai bar. Yang tertinggi menjadi prediksi.</dd></div>
+      <div><dt class="font-medium">Grade & Expected grade (APTOS)</dt><dd class="text-ink-500">Tingkat keparahan DR dari 0 (tidak ada) sampai 4 (proliferatif). <b>Expected grade</b> = perkiraan tingkat rata-rata, memperhitungkan bahwa tingkat itu berurutan.</dd></div>
+      <div><dt class="font-medium">Rujukan (referable DR)</dt><dd class="text-ink-500">Bila tingkat ≥ 2 (DR sedang ke atas), kasus ditandai <b>perlu dirujuk</b> ke dokter mata.</dd></div>
+      <div><dt class="font-medium">Attention Rollout</dt><dd class="text-ink-500">Peta area yang paling "dilihat" model saat menilai citra — menjawab <i>di mana model memusatkan perhatian</i>.</dd></div>
+      <div><dt class="font-medium">LeGrad</dt><dd class="text-ink-500">Peta area yang paling <i>memengaruhi</i> keputusan untuk kelas yang diprediksi — menyoroti bagian yang mendorong model memilih diagnosis tersebut.</dd></div>
+      <div><dt class="font-medium">Heatmap & Overlay</dt><dd class="text-ink-500">Warna biru→merah menandai perhatian rendah→tinggi. <b>Overlay</b> = heatmap ditumpuk di atas citra agar mudah dibaca.</dd></div>
+    </dl>
+  </div>
+</div>
+
+<div class="rounded-card border border-danger/30 bg-dangerbg p-4 mt-5 text-[13px] text-ink-700 flex items-start gap-2">
+  <i data-lucide="alert-triangle" class="w-4 h-4 text-danger mt-0.5 shrink-0"></i>
+  <span><b>Penting:</b> RetinaSense adalah prototipe penelitian, belum divalidasi klinis dan bukan alat diagnosis. Hasil tidak menggantikan penilaian dokter.</span>
+</div>
+{% endblock %}
+{% block scripts %}<script>lucide.createIcons();</script>{% endblock %}

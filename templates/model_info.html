@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Model Information{% endblock %}
+
+{% block content %}
+<header class="mb-6">
+  <h1 class="text-[28px] font-bold tracking-tight">Model Information</h1>
+  <p class="text-[14px] text-ink-600 mt-1">Detail arsitektur, kelas, dan metrik evaluasi tiap model. RetinaSense adalah proyek penelitian, bukan sekadar demo.</p>
+</header>
+
+<div class="flex flex-wrap gap-2 mb-5" id="modelTabs"></div>
+<div id="cardWrap" class="grid grid-cols-1 lg:grid-cols-3 gap-5"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/state.js') }}"></script>
+<script>
+(async function () {
+  const wrap = document.getElementById('cardWrap');
+  const tabsEl = document.getElementById('modelTabs');
+  const d = await RS.loadModels();
+  const models = Object.entries(d.models).map(([key, m]) => ({ key, ...m }));
+
+  tabsEl.innerHTML = models.map((m, i) =>
+    `<button data-key="${m.key}" class="m-tab px-4 py-2 rounded-lg text-[14px] font-medium">${m.name}</button>`).join('');
+  tabsEl.querySelectorAll('.m-tab').forEach(b => b.addEventListener('click', () => load(b.dataset.key)));
+
+  function box(title, inner, cls='') { return `<div class="rounded-card border border-line bg-surface p-5 ${cls}"><h3 class="font-semibold text-[15px] mb-3">${title}</h3>${inner}</div>`; }
+  function kv(k,v){ return `<div class="flex justify-between py-1.5 border-b border-line last:border-0 text-[13px]"><span class="text-ink-500">${k}</span><span class="font-medium text-right">${v ?? '—'}</span></div>`; }
+  const pct = v => (v==null?'—':(v*100).toFixed(1)+'%');
+
+  async function load(key) {
+    const m = models.find(x => x.key === key);
+    tabsEl.querySelectorAll('.m-tab').forEach(b => {
+      const on = b.dataset.key === key;
+      b.classList.toggle('bg-primary-600', on); b.classList.toggle('text-white', on);
+      b.classList.toggle('bg-surface', !on); b.classList.toggle('border', !on); b.classList.toggle('border-line', !on);
+    });
+    wrap.innerHTML = '<p class="text-ink-500 text-[14px]">Memuat...</p>';
+
+    const r = await fetch('/api/card/' + key);
+    const c = await r.json();
+
+    if (!r.ok) {
+      wrap.innerHTML = box('Kartu model belum tersedia', `
+        <p class="text-[13px] text-ink-600 mb-3">${c.error || 'Tidak ada data.'}</p>
+        <p class="text-[13px] text-ink-600">Taruh file JSON kartu model di folder <code class="bg-surface-2 px-1.5 py-0.5 rounded text-[12px]">checkpoints/</code> (atau root project) dengan nama:</p>
+        <div class="mt-2 text-[13px] font-mono bg-surface-2 rounded-lg p-3">
+          model_card_${key}.json
+          <span class="text-ink-500"> ← spesifik untuk ${m ? m.name : key}</span>
+        </div>
+        <p class="text-[12px] text-ink-500 mt-2">Kalau tidak ada file spesifik model, sistem otomatis pakai kartu per-dataset
+        (<code>model_card_${m ? m.dataset : '?'}.json</code>).</p>`, 'lg:col-span-3');
+      return;
+    }
+
+    const t = c.with_tta || c.test?.with_tta || {};
+    const classes = c.data?.classes || c.classes || [];
+    const clsHtml = classes.map(x => `<span class="inline-block px-2 py-1 rounded bg-surface-2 text-[12px] mr-1 mb-1">${x}</span>`).join('') || '—';
+    const perf = [
+      kv('Accuracy', pct(t.accuracy)),
+      kv('Balanced acc', pct(t.bal_acc)),
+      kv('F1', pct(t.f1)),
+      kv('AUROC', t.auroc?.toFixed(3)),
+      c.task_type==='ordinal' ? kv('QWK', t.qwk?.toFixed(3)) : '',
+    ].join('');
+    const lim = (c.limitations||[]).map(l => `<div class="text-[13px] mb-2"><div class="font-medium">${l.title}</div><div class="text-ink-500">${l.detail}</div></div>`).join('') || '<p class="text-[13px] text-ink-500">—</p>';
+
+    // tabel performa per kelas (dari test.per_class)
+    const perClass = c.test?.per_class || c.per_class || [];
+    let perClassBox = '';
+    if (perClass.length) {
+      const rows = perClass.map(p => `<tr class="hover:bg-surface-2">
+        <td class="px-3 py-2 font-medium">${p.class}</td>
+        <td class="px-3 py-2 tabular-nums text-right">${pct(p.precision)}</td>
+        <td class="px-3 py-2 tabular-nums text-right">${pct(p.recall)}</td>
+        <td class="px-3 py-2 tabular-nums text-right">${pct(p.f1)}</td>
+        <td class="px-3 py-2 tabular-nums text-right text-ink-500">${p.support ?? '—'}</td>
+      </tr>`).join('');
+      perClassBox = `<div class="rounded-card border border-line bg-surface p-5 lg:col-span-3">
+        <h3 class="font-semibold text-[15px] mb-3">Performa per kelas (test, +TTA)</h3>
+        <div class="overflow-x-auto"><table class="w-full text-[13px] min-w-[460px]">
+          <thead class="text-ink-600 border-b border-line">
+            <tr><th class="px-3 py-2 text-left font-semibold">Kelas</th>
+            <th class="px-3 py-2 text-right font-semibold">Precision</th>
+            <th class="px-3 py-2 text-right font-semibold">Recall</th>
+            <th class="px-3 py-2 text-right font-semibold">F1</th>
+            <th class="px-3 py-2 text-right font-semibold">Support</th></tr>
+          </thead>
+          <tbody class="divide-y divide-line">${rows}</tbody>
+        </table></div>
+        <p class="text-[11px] text-ink-500 mt-2">Recall rendah pada suatu kelas = model sering melewatkan kasus kelas tersebut.</p>
+      </div>`;
+    }
+
+    wrap.innerHTML =
+      box('Ringkasan', [
+        kv('Model', m ? m.name : key),
+        kv('Dataset', c.dataset),
+        kv('Tipe tugas', c.task_type),
+        kv('Backbone', c.backbone || (m && m.arch)),
+        kv('Input', c.image_size ? c.image_size+'×'+c.image_size : null),
+        kv('Checkpoint', m && m.checkpoint),
+        kv('Stage', c.stage),
+      ].join('')) +
+      box('Performa (test, +TTA)', perf) +
+      box('Kelas & keterbatasan', `<div class="mb-4">${clsHtml}</div><div class="text-[12px] font-semibold text-ink-600 mb-2">Keterbatasan</div>${lim}`) +
+      perClassBox +
+      box('Intended use', `<p class="text-[13px] text-ink-600">${c.intended_use||'—'}</p>`, 'lg:col-span-3');
+  }
+
+  if (models.length) load(models[0].key);
+})();
+</script>
+{% endblock %}

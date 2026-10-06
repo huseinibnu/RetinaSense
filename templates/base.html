@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}RetinaSense{% endblock %} · RetinaSense</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='assets/icons/eye_icon_test.png') }}">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            primary: {
+              50: '#EFF6FF', 100: '#DBEAFE', 300: '#93C5FD',
+              500: '#3B82F6', 600: '#2563EB', 700: '#1D4ED8',
+            },
+            ink: {
+              900: '#0F172A', 700: '#334155', 600: '#475569', 500: '#64748B',
+            },
+            surface: { DEFAULT: '#FFFFFF', 2: '#F1F5F9' },
+            page: '#F8FAFC',
+            line: '#E2E8F0',
+            ok: '#16A34A', okbg: '#F0FDF4',
+            warn: '#F59E0B', warnbg: '#FFFBEB',
+            danger: '#EF4444', dangerbg: '#FEF2F2',
+          },
+          borderRadius: { card: '12px', panel: '16px' },
+        },
+      },
+    };
+  </script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-page text-ink-900 font-sans antialiased">
+
+  {% set nav = [
+    ('dashboard', 'Dashboard', 'layout-dashboard', url_for('page_dashboard')),
+    ('analysis', 'Analysis', 'scan-eye', url_for('page_analysis')),
+    ('history', 'History', 'history', url_for('page_history')),
+    ('dataset', 'Dataset', 'database', url_for('page_dataset')),
+    ('model_info', 'Model Information', 'cpu', url_for('page_model_info')),
+    ('help', 'Help', 'circle-help', url_for('page_help')),
+  ] %}
+
+  <!-- Top navbar -->
+  <header id="topnav" class="sticky top-0 z-40">
+    <div class="max-w-[1280px] mx-auto px-5 h-16 flex items-center gap-4">
+
+      <!-- Logo -->
+      <a href="{{ url_for('page_dashboard') }}" class="flex items-center gap-2.5 shrink-0">
+        <img src="{{ url_for('static', filename='assets/icons/eye_icon_test.png') }}" alt="RetinaSense"
+             class="w-9 h-9 rounded-lg object-cover"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <span class="w-9 h-9 rounded-lg bg-primary-600 text-white items-center justify-center" style="display:none"><i data-lucide="eye" class="w-5 h-5"></i></span>
+        <span class="leading-tight hidden sm:block">
+          <span class="block font-bold text-[15px]">RetinaSense</span>
+          <span class="block text-[11px] text-ink-500">AI for Better Vision</span>
+        </span>
+      </a>
+
+      <div class="flex-1"></div>
+
+      <!-- Desktop nav -->
+      <nav class="hidden lg:flex items-stretch gap-1 self-stretch">
+        {% for key, label, icon, href in nav %}
+        <a href="{{ href }}"
+           class="nav-link flex items-center gap-2 px-3 text-[14px] font-medium transition
+                  {% if active == key %}is-active{% else %}text-ink-600 hover:text-ink-900{% endif %}">
+          <i data-lucide="{{ icon }}" class="w-[17px] h-[17px]"></i>{{ label }}
+        </a>
+        {% endfor %}
+      </nav>
+
+      <!-- User chip -->
+      <div class="hidden sm:flex items-center gap-2.5 pl-3 border-l border-line">
+        <div class="text-right leading-tight">
+          <div class="text-[13px] font-semibold">Husein Ibnu</div>
+          <div class="text-[11px] text-ink-500">Student</div>
+        </div>
+        <div class="w-9 h-9 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-[13px] font-semibold">HI</div>
+      </div>
+
+      <!-- Mobile hamburger -->
+      <button id="menuBtn" class="lg:hidden p-2 rounded-lg hover:bg-surface-2"><i data-lucide="menu" class="w-5 h-5"></i></button>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobileMenu" class="lg:hidden hidden border-t border-line bg-surface px-3 py-2 space-y-1">
+      {% for key, label, icon, href in nav %}
+      <a href="{{ href }}"
+         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[14px] font-medium
+                {% if active == key %}bg-primary-50 text-primary-600{% else %}text-ink-600 hover:bg-surface-2{% endif %}">
+        <i data-lucide="{{ icon }}" class="w-[18px] h-[18px]"></i>{{ label }}
+      </a>
+      {% endfor %}
+      <div class="flex items-center gap-3 px-3 py-2.5 border-t border-line mt-1 pt-3">
+        <div class="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-[12px] font-semibold">HI</div>
+        <div class="leading-tight"><div class="text-[13px] font-semibold">Husein Ibnu</div><div class="text-[11px] text-ink-500">Student</div></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="max-w-[1280px] mx-auto px-5 sm:px-7 py-7">
+    {% block content %}{% endblock %}
+    <div class="mt-10 text-[12px] text-ink-500 border-t border-line pt-4">
+      <span class="inline-flex items-center gap-1.5"><i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-warn"></i>
+      Prototipe penelitian — <strong class="text-ink-600">bukan alat bantu diagnosis.</strong> Belum divalidasi klinis dan tidak menggantikan penilaian dokter mata.</span>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById('menuBtn')?.addEventListener('click', () => {
+      document.getElementById('mobileMenu').classList.toggle('hidden');
+    });
+    // navbar: transparan di atas, solid + blur saat scroll
+    const topnav = document.getElementById('topnav');
+    const onScroll = () => topnav.classList.toggle('nav-scrolled', window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    lucide.createIcons();
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Dataset{% endblock %}
+
+{% block content %}
+<header class="mb-6">
+  <h1 class="text-[28px] font-bold tracking-tight">Dataset</h1>
+  <p class="text-[14px] text-ink-600 mt-1">Dataset yang digunakan untuk melatih dan mengevaluasi model.</p>
+</header>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+  <div class="rounded-card border border-line bg-surface p-5">
+    <div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center"><i data-lucide="eye" class="w-5 h-5"></i></div><div><h3 class="font-semibold text-[16px]">APTOS 2019</h3><p class="text-[12px] text-ink-500">Funduscopy · Diabetic Retinopathy</p></div></div>
+    <p class="text-[13px] text-ink-600 mb-3">Grading retinopati diabetik berskala ordinal 0–4, dari citra fundus warna (CFP).</p>
+    <div class="flex flex-wrap gap-2 text-[12px]">
+      {% for c in ['Tidak ada DR','DR ringan','DR sedang','DR berat','DR proliferatif'] %}
+      <span class="px-2 py-1 rounded bg-surface-2">{{ c }}</span>{% endfor %}
+    </div>
+  </div>
+
+  <div class="rounded-card border border-line bg-surface p-5">
+    <div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 rounded-lg bg-primary-50 text-primary-600 flex items-center justify-center"><i data-lucide="layers" class="w-5 h-5"></i></div><div><h3 class="font-semibold text-[16px]">OCTID</h3><p class="text-[12px] text-ink-500">OCT · Multi-penyakit retina</p></div></div>
+    <p class="text-[13px] text-ink-600 mb-3">Klasifikasi kategori penyakit retina dari B-scan OCT.</p>
+    <div class="flex flex-wrap gap-2 text-[12px]">
+      {% for c in ['Normal','ARMD','CSR','Retinopati diabetik','Macular hole'] %}
+      <span class="px-2 py-1 rounded bg-surface-2">{{ c }}</span>{% endfor %}
+    </div>
+  </div>
+</div>
+
+<div class="rounded-card border border-warn/30 bg-warnbg p-4 mt-5 text-[13px] text-ink-700 flex items-start gap-2">
+  <i data-lucide="shield-alert" class="w-4 h-4 text-warn mt-0.5 shrink-0"></i>
+  Citra fundus/OCT adalah data medis. Gunakan hanya dataset dengan lisensi yang mengizinkan, dan jangan mengunggah data pasien tanpa persetujuan.
+</div>
+{% endblock %}
+{% block scripts %}<script>lucide.createIcons();</script>{% endblock %}
